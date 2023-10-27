@@ -1,0 +1,28 @@
+version: '3.7'
+
+services:
+  node:
+    image: node:20
+    volumes:
+      - ./:/app
+    working_dir: /app/vite
+    expose:
+      - "3000"
+#    ports:
+#      - "3000:3000"
+    environment:
+      - APPLICATION_UID=${APPLICATION_UID:-1000}
+      - APPLICATION_GID=${APPLICATION_GID:-1000}
+      - VIRTUAL_HOST=${DOMAIN:?DOMAIN is required}
+      - VIRTUAL_PORT=3000
+    env_file:
+      - .env
+    stop_signal: SIGKILL
+    entrypoint: bash -c 'groupmod -g $$APPLICATION_GID node; usermod -u $$APPLICATION_UID node; tail -f /dev/null'
+    networks:
+      - default
+
+networks:
+  default:
+    external:
+      name: global
